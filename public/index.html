@@ -25,7 +25,7 @@
       align-items: center;
       padding-bottom: 18px;
       border-bottom: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .title {
@@ -37,7 +37,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
-      margin-top: 24px;
+      margin-top: 20px;
     }
 
     .card {
@@ -109,6 +109,7 @@
       padding: 16px;
       color: #ccfbf1;
       display: none;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -131,9 +132,9 @@
         <div>Produtos disponíveis</div>
       </div>
       <div class="card">
-        <div class="badge">Sistema</div>
-        <div class="value" id="statusText">Online</div>
-        <div>Estado da plataforma</div>
+        <div class="badge">Marketing</div>
+        <div class="value" id="marketingStatus">Pronto</div>
+        <div>Campanhas preparadas</div>
       </div>
     </div>
 
@@ -167,9 +168,9 @@
 
         document.getElementById('kiwifyCount').textContent = data.kiwify?.ok ? '1' : '0';
         document.getElementById('hotmartCount').textContent = data.hotmart?.ok ? '1' : '0';
-        document.getElementById('statusText').textContent = 'Sincronizado';
+        document.getElementById('marketingStatus').textContent = 'Gerado';
       } catch (error) {
-        document.getElementById('statusText').textContent = 'Erro';
+        document.getElementById('marketingStatus').textContent = 'Erro';
       }
     }
 

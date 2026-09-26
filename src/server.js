@@ -4,6 +4,7 @@ const config = require('./config');
 const { syncProducts } = require('./services/syncService');
 const { getKiwifyProducts } = require('./services/kiwifyService');
 const { getHotmartProducts } = require('./services/hotmartService');
+const { createMarketingFlow } = require('./services/offersService');
 
 const app = express();
 app.use(express.json());
@@ -44,6 +45,11 @@ app.post('/api/offers', async (req, res) => {
   };
 
   return res.status(201).json({ ok: true, data: payload });
+});
+
+app.get('/api/marketing', async (req, res) => {
+  const result = await createMarketingFlow();
+  res.json(result);
 });
 
 app.get('/', (req, res) => {
