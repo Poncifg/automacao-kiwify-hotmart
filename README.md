@@ -1,3 +1,4 @@
+npm install
 # Automação Kiwify + Hotmart
 
 Projeto base para automatizar o ciclo de vendas de um produto digital com links, campanhas e sincronização de informações entre Kiwify e Hotmart.
