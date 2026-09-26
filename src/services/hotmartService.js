@@ -1,53 +1,65 @@
 const axios = require('axios');
-const config = require('./../config');
+const config = require('../config');
+
+const hotmartClient = axios.create({
+  baseURL: config.hotmart.apiUrl,
+  headers: {
+    'Authorization': `Bearer ${config.hotmart.apiToken}`,
+    'Content-Type': 'application/json'
+  },
+  timeout: 5000
+});
 
 async function getHotmartProducts() {
-  if (!config.h.token) {
-    return { ok: false, message: 'Token da Hotmart não definido.' };
-  }
-
   try {
-    const response = await axios.get(`${config.h.url}/products`, {
-      headers: {
-        Authorization: `Bearer ${config.h.token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    if (!config.hotmart.apiToken) {
+      return {
+        ok: false,
+        message: 'Token da Hotmart não configurado',
+        products: [],
+        total: 0
+      };
+    }
 
-    return { ok: true, data: response.data };
+    const response = await hotmartClient.get('/products');
+    
+    return {
+      ok: true,
+      message: 'Produtos Hotmart obtidos com sucesso',
+      products: response.data.data || response.data || [],
+      total: (response.data.data || response.data || []).length,
+      timestamp: new Date().toISOString()
+    };
   } catch (error) {
+    console.error('Erro ao buscar produtos Hotmart:', error.message);
     return {
       ok: false,
-      message: 'Erro ao consultar Hotmart.',
-      details: error.response?.data || error.message
+      message: error.message || 'Erro ao conectar com Hotmart',
+      products: [],
+      total: 0,
+      error: true
     };
   }
 }
 
-async function getHotmartProductById(productId) {
-  if (!config.h.token) {
-    return { ok: false, message: 'Token da Hotmart não definido.' };
-  }
-
+async function createHotmartOffer(offerData) {
   try {
-    const response = await axios.get(`${config.h.url}/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${config.h.token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    return { ok: true, data: response.data };
+    const response = await hotmartClient.post('/products', offerData);
+    return {
+      ok: true,
+      message: 'Oferta criada na Hotmart',
+      data: response.data
+    };
   } catch (error) {
+    console.error('Erro ao criar oferta Hotmart:', error.message);
     return {
       ok: false,
-      message: 'Erro ao consultar produto da Hotmart.',
-      details: error.response?.data || error.message
+      message: error.message
     };
   }
 }
 
 module.exports = {
   getHotmartProducts,
-  getHotmartProductById
+  createHotmartOffer
 };

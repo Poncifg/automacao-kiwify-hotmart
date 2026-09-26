@@ -1,53 +1,65 @@
 const axios = require('axios');
-const config = require('./config');
+const config = require('../config');
+
+const kiwifyClient = axios.create({
+  baseURL: config.kiwify.apiUrl,
+  headers: {
+    'Authorization': `Bearer ${config.kiwify.apiToken}`,
+    'Content-Type': 'application/json'
+  },
+  timeout: 5000
+});
 
 async function getKiwifyProducts() {
-  if (!config.k.token) {
-    return { ok: false, message: 'Token da Kiwify não definido.' };
-  }
-
   try {
-    const response = await axios.get(`${config.k.url}/products`, {
-      headers: {
-        Authorization: `Bearer ${config.k.token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    if (!config.kiwify.apiToken) {
+      return {
+        ok: false,
+        message: 'Token da Kiwify não configurado',
+        products: [],
+        total: 0
+      };
+    }
 
-    return { ok: true, data: response.data };
+    const response = await kiwifyClient.get('/products');
+    
+    return {
+      ok: true,
+      message: 'Produtos Kiwify obtidos com sucesso',
+      products: response.data.data || response.data || [],
+      total: (response.data.data || response.data || []).length,
+      timestamp: new Date().toISOString()
+    };
   } catch (error) {
+    console.error('Erro ao buscar produtos Kiwify:', error.message);
     return {
       ok: false,
-      message: 'Erro ao consultar Kiwify.',
-      details: error.response?.data || error.message
+      message: error.message || 'Erro ao conectar com Kiwify',
+      products: [],
+      total: 0,
+      error: true
     };
   }
 }
 
-async function getKiwifyProductById(productId) {
-  if (!config.k.token) {
-    return { ok: false, message: 'Token da Kiwify não definido.' };
-  }
-
+async function createKiwifyOffer(offerData) {
   try {
-    const response = await axios.get(`${config.k.url}/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${config.k.token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    return { ok: true, data: response.data };
+    const response = await kiwifyClient.post('/products', offerData);
+    return {
+      ok: true,
+      message: 'Oferta criada na Kiwify',
+      data: response.data
+    };
   } catch (error) {
+    console.error('Erro ao criar oferta Kiwify:', error.message);
     return {
       ok: false,
-      message: 'Erro ao consultar produto da Kiwify.',
-      details: error.response?.data || error.message
+      message: error.message
     };
   }
 }
 
 module.exports = {
   getKiwifyProducts,
-  getKiwifyProductById
+  createKiwifyOffer
 };
